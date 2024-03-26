@@ -39,11 +39,15 @@ app.get('/clients', (req, res) => {
 //Display the list of clients in the HTML format
 app.get('/clientslist', (req, res) => {
   let html = clients.map((client, index) => {
+    console.log(client);
     return `
       <li>
-        ${client.name}, ${client.email}, ${client.city}
-        <form action="/update-client/${index}" method="post">
-          <input type="submit" value="Update">
+        ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id - 1}">Update</a>
+        <form action="/update-client/${client.id}" method="post">
+          <input type="hidden" name="name" value="${client.name}">
+          <input type="hidden" name="email" value="${client.email}">
+          <input type="hidden" name="city" value="${client.city}">
+          <input type="hidden" name="submit" value="Update">
         </form>
         <form action="/delete-client/${index}" method="post">
           <input type="submit" value="Delete">
@@ -59,6 +63,36 @@ app.post('/delete-client/:id', (req, res) => {
   const id = req.params.id;
   if (id >= 0 && id < clients.length) {
     clients.splice(id, 1);
+    res.redirect('/clientslist');
+  } else {
+    res.status(400).send('Invalid client ID');
+  }
+});
+
+//Handle the update client
+app.get('/update-client/:id', (req, res) => {
+  const id = req.params.id;
+  if (id >= 0 && id < clients.length) {
+    const client = clients[id];
+    let html = `
+      <form action="/update-client/${id}" method="post">
+        Name: <input type="text" name="name" value="${client.name}"><br>
+        Email: <input type="text" name="email" value="${client.email}"><br>
+        City: <input type="text" name="city" value="${client.city}"><br>
+        <input type="submit" value="Update">
+      </form>
+    `;
+    res.send(html);
+  } else {
+    res.status(400).send('Invalid client ID');
+  }
+});
+
+app.post('/update-client/:id', (req, res) => {
+  const id = req.params.id;
+  if (id >= 0 && id < clients.length) {
+    const { name, email, city } = req.body;
+    clients[id] = { name, email, city };
     res.redirect('/clientslist');
   } else {
     res.status(400).send('Invalid client ID');
@@ -98,7 +132,7 @@ app.post('/createuser', (req, res) => {
     res.status(400).send('Bad Request: Both name and email must be provided');
     return;
   }
-  id = clients.length > 0 ? clients[clients.length - 1].id + 1 : 1;
+  id = (clients.length > 0 && !isNaN(clients[clients.length - 1].id)) ? clients[clients.length - 1].id + 1 : 1;
   clients.push({ id, name, email, city });
   res.redirect('/clientslist');
 });
