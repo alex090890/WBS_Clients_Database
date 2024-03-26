@@ -38,10 +38,31 @@ app.get('/clients', (req, res) => {
 
 //Display the list of clients in the HTML format
 app.get('/clientslist', (req, res) => {
-  let html = clients.map(client => {
-    return `<li>${client.name}, ${client.email}, ${client.city}</li>`;
+  let html = clients.map((client, index) => {
+    return `
+      <li>
+        ${client.name}, ${client.email}, ${client.city}
+        <form action="/update-client/${index}" method="post">
+          <input type="submit" value="Update">
+        </form>
+        <form action="/delete-client/${index}" method="post">
+          <input type="submit" value="Delete">
+        </form>
+      </li>
+    `;
   }).join('');
   res.send(html);
+});
+
+//Handle the client deletion
+app.post('/delete-client/:id', (req, res) => {
+  const id = req.params.id;
+  if (id >= 0 && id < clients.length) {
+    clients.splice(id, 1);
+    res.redirect('/clientslist');
+  } else {
+    res.status(400).send('Invalid client ID');
+  }
 });
 
 //Display the list of clients in the HTML format according to the clients's id
