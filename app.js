@@ -50,7 +50,7 @@ app.get('/clientslist', (req, res) => {
   let html = clients.map((client, index) => {
     return `
       <li>
-        ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id}">Update</a>
+        ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id - 1}">Update</a>
         <form action="/update-client/${client.id}" method="post">
           <input type="hidden" name="name" value="${client.name}">
           <input type="hidden" name="email" value="${client.email}">
