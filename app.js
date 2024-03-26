@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
   const { login, password } = req.body;
   if (login === 'alexprof' && password === 'ilya2003') {
-    res.redirect('/clientslist');
+    res.redirect('/home');
   } else {
     res.status(401).send(`
   <h1>Error: Invalid username or password.</h1>
@@ -31,25 +31,33 @@ app.post('/login', (req, res) => {
   }
 });
 
+app.get('/home', (req, res) => {
+  res.send(`
+  <h1>Welcome to the home page</h1>
+  <button style="background-color: green; color: white;" onclick="location.href='/clients'">View clients in the JSON format</button>
+  <button style="background-color: green; color: white;" onclick="location.href='/clientslist'">View clients list</button>
+  <button style="background-color: green; color: white;" onclick="location.href='/createuser'">Create a new user</button>
+  `)
+});
+
 //Display the list of clients in the JSON format
 app.get('/clients', (req, res) => {
   res.json(clients);
-})
+});
 
 //Display the list of clients in the HTML format
 app.get('/clientslist', (req, res) => {
   let html = clients.map((client, index) => {
-    console.log(client);
     return `
       <li>
-        ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id - 1}">Update</a>
+        ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id}">Update</a>
         <form action="/update-client/${client.id}" method="post">
           <input type="hidden" name="name" value="${client.name}">
           <input type="hidden" name="email" value="${client.email}">
           <input type="hidden" name="city" value="${client.city}">
           <input type="hidden" name="submit" value="Update">
         </form>
-        <form action="/delete-client/${index}" method="post">
+        <form action="/delete-client/${client.id}" method="post">
           <input type="submit" value="Delete">
         </form>
       </li>
