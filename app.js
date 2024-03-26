@@ -47,23 +47,31 @@ app.get('/clients', (req, res) => {
 
 //Display the list of clients in the HTML format
 app.get('/clientslist', (req, res) => {
-  let html = clients.map((client, index) => {
-    return `
+  let html = `<h1> List of users</h1>`;
+  html += clients.map((client, index) => {
+  return `
+    <div>
       <li>
-        ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id - 1}">Update</a>
-        <form action="/update-client/${client.id}" method="post">
-          <input type="hidden" name="name" value="${client.name}">
-          <input type="hidden" name="email" value="${client.email}">
-          <input type="hidden" name="city" value="${client.city}">
-          <input type="hidden" name="submit" value="Update">
-        </form>
-        <form action="/delete-client/${client.id}" method="post">
-          <input type="submit" value="Delete">
-        </form>
-      </li>
-    `;
-  }).join('');
-  res.send(html);
+      ${client.name}, ${client.email}, ${client.city} <a href="/update-client/${client.id - 1}">Update</a>
+      <form action="/update-client/${client.id}" method="post">
+        <input type="hidden" name="name" value="${client.name}">
+        <input type="hidden" name="email" value="${client.email}">
+        <input type="hidden" name="city" value="${client.city}">
+        <input type="hidden" name="submit" value="Update">
+      </form>
+      <form action="/delete-client/${client.id}" method="post">
+        <input type="submit" value="Delete">
+      </form>
+    </li>
+    </div>
+  `;
+}).join('');
+
+html += `
+  <button style="background-color: green; color: white;" onclick="location.href='/createuser'">Create a new user</button>
+`;
+
+res.send(html);
 });
 
 //Handle the client deletion
